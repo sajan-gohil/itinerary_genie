@@ -1,0 +1,28 @@
+{
+  "name": "itinerary-genie-client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview"
+  },
+  "dependencies": {
+    "react": "*",
+    "react-dom": "*",
+    "react-router-dom": "*",
+    "leaflet": "*",
+    "react-leaflet": "*",
+    "@dnd-kit/core": "*",
+    "@dnd-kit/sortable": "*",
+    "axios": "*"
+  },
+  "devDependencies": {
+    "typescript": "*",
+    "vite": "*",
+    "@vitejs/plugin-react": "*",
+    "tailwindcss": "*",
+    "postcss": "*",
+    "autoprefixer": "*"
+  }
+}

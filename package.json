@@ -1,0 +1,26 @@
+{
+  "name": "itinerary-genie-monorepo",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "start": "npm run start --workspace server && npm run start --workspace client",
+    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\""
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.7",
+    "@types/supertest": "^6.0.3",
+    "concurrently": "^8.2.2",
+    "supertest": "^7.1.4"
+  },
+  "dependencies": {
+    "@api/fsq-developers-places": "file:.api/apis/fsq-developers-places",
+    "dotenv": "^17.2.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
