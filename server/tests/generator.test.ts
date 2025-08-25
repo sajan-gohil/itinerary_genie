@@ -29,4 +29,33 @@ describe('generateItinerary', () => {
     expect(result.routeRequest.origin).toEqual(origin);
     expect(result.routeRequest.destinations.length).toBe(2);
   });
+
+  it('handles only fixed tasks', async () => {
+    const tasks = [
+      { id: 'fixed1', location: { lat: 10, lon: 20 } },
+      { id: 'fixed2', location: { lat: 11, lon: 21 } }
+    ];
+    const origin = { lat: 1, lon: 2 };
+    const result = await generateItinerary({ tasks, origin, mode: 'order', transportMode: 'walking' });
+    expect(result.orderedStops.length).toBe(2);
+    expect(result.orderedStops[0].place.location).toEqual({ lat: 10, lon: 20 });
+    expect(result.orderedStops[1].place.location).toEqual({ lat: 11, lon: 21 });
+    expect(result.routeRequest.origin).toEqual(origin);
+    expect(result.routeRequest.destinations.length).toBe(2);
+  });
+
+  it('handles no candidates for a flexible task', async () => {
+    const mockSearchPlaces = require('../src/places/foursquare').searchPlaces;
+    mockSearchPlaces.mockResolvedValueOnce([]); // No candidates for first flexible task
+    const tasks = [
+      { id: 't1', required_tags: ['chill'] }
+    ];
+    const origin = { lat: 1, lon: 2 };
+    const result = await generateItinerary({ tasks, origin, mode: 'order', transportMode: 'walking' });
+    expect(result.orderedStops.length).toBe(1);
+    expect(result.orderedStops[0].place.id).toBe('no_candidate');
+    expect(result.orderedStops[0].place.name).toMatch(/No candidate/);
+    expect(result.routeRequest.origin).toEqual(origin);
+    expect(result.routeRequest.destinations.length).toBe(1);
+  });
 });

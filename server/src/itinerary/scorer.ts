@@ -12,6 +12,7 @@ export type CandidatePlace = {
   tags?: string[];
   review_snippets?: string[];
   location: { lat: number; lon: number };
+  name?: string;
 };
 
 export type Task = {

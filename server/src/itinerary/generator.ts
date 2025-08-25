@@ -41,7 +41,18 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
   const flexibleTasks: Task[] = [];
   for (const t of tasks) {
     if ((t as any).location) {
-      fixedTasks.push({ taskId: t.id, place: { ...(t as any).location, id: t.id } });
+      fixedTasks.push({
+        taskId: t.id,
+        place: {
+          id: t.id,
+          location: { lat: (t as any).location.lat, lon: (t as any).location.lon },
+          name: (t as any).name ?? `Fixed task ${t.id}`,
+          rating: undefined,
+          review_count: undefined,
+          tags: [],
+          review_snippets: []
+        }
+      });
     } else {
       flexibleTasks.push(t);
     }
@@ -55,14 +66,27 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
     const query = task.required_tags?.[0] || '';
     const placeCandidates = await searchPlaces({ query, ll, limit: 5 });
     // Map PlaceCandidate to CandidatePlace
-    const candidates: CandidatePlace[] = placeCandidates.map(pc => ({
+    let candidates: CandidatePlace[] = placeCandidates.map(pc => ({
       id: pc.id,
       rating: pc.rating,
       review_count: undefined,
       tags: pc.categories,
       review_snippets: [],
-      location: { lat: pc.lat, lon: pc.lon }
+      location: { lat: pc.lat, lon: pc.lon },
+      name: pc.name
     }));
+    // If no candidates, insert placeholder
+    if (candidates.length === 0) {
+      candidates = [{
+        id: 'no_candidate',
+        rating: undefined,
+        review_count: undefined,
+        tags: [],
+        review_snippets: [],
+        location: gapLocation,
+        name: 'No candidate — requires user input'
+      }];
+    }
     // 3. Analyze reviews if present
     for (const c of candidates) {
       if (c.tags && c.tags.length === 0 && c.review_snippets) {
