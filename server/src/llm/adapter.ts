@@ -1,3 +1,7 @@
+export async function getLLMCompletion({ prompt, provider = 'openai' }: { prompt: string; provider?: LLMProvider }): Promise<string> {
+  const adapter = getAdapter(provider);
+  return adapter.generate(prompt);
+}
 import { config } from '../config';
 import { PARSE_TASKS_PROMPT } from './prompts';
 import crypto from 'crypto';

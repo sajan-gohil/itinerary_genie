@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
+import { postAnalyzeReviews } from './api/analyzeReviews';
+import { postGenerateItinerary } from './api/generateItinerary';
 import { config } from './config';
 import parseTasksRouter from './api/parseTasks';
 import searchPlacesRouter from './api/searchPlaces';
@@ -43,10 +45,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api', parseTasksRouter);
 
-app.post('/api/generate-itinerary', (req, res) => {
-  // TODO: Implement itinerary generation logic
-  res.json({ message: 'generate-itinerary endpoint' });
-});
+app.post('/api/generate-itinerary', postGenerateItinerary);
 
 app.get('/api/place-details/:source/:placeId', (req, res) => {
   // TODO: Implement place details logic
@@ -54,6 +53,7 @@ app.get('/api/place-details/:source/:placeId', (req, res) => {
   res.json({ source, placeId, details: null });
 });
 
+app.post('/api/analyze-reviews', postAnalyzeReviews);
 
 app.use('/api', searchPlacesRouter);
 
