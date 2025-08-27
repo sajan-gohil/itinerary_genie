@@ -17,7 +17,7 @@ export type AnalyzeReviewsOutput = {
   confidence: number;
 };
 
-[
+const TAGS = [
   "chill",
   "quick_bite",
   "family_friendly",

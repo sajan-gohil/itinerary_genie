@@ -4,7 +4,6 @@ export async function getLLMCompletion({ prompt, provider = 'openai' }: { prompt
 }
 import { config } from '../config';
 import { PARSE_TASKS_PROMPT } from './prompts';
-import crypto from 'crypto';
 
 export type LLMProvider = 'openai' | 'mock';
 
@@ -23,8 +22,8 @@ class OpenAIAdapter implements LLMAdapter {
   async generate(prompt: string, options: GenerateOptions = {}): Promise<string> {
     const apiKey = options.apiKey || config.OPENAI_API_KEY;
     if (!apiKey) throw new Error('Missing OpenAI API key');
-    const model = options.model || 'gpt-3.5-turbo';
-    const temperature = options.temperature ?? 0.0;
+    const model = options.model || process.env.OPENAI_MODEL || 'gpt-4o';
+    const temperature = options.temperature ?? Number(process.env.OPENAI_TEMPERATURE ?? 0);
     const url = 'https://api.openai.com/v1/chat/completions';
     const body = {
       model,

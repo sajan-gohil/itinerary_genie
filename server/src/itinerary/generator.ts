@@ -36,6 +36,10 @@ function haversine(a: { lat: number; lon: number }, b: { lat: number; lon: numbe
 }
 
 export async function generateItinerary({ tasks, origin, mode, transportMode, userPrefs = {} }: GeneratorInput): Promise<GeneratorOutput> {
+  console.log("Origin at start of generateItinerary = ", origin);
+  console.log("Tasks = ", tasks);
+  console.log("Mode = ", mode);
+  console.log("Transport Mode = ", transportMode);
   // 1. Insert fixed-location tasks first
   const fixedTasks: OrderedStop[] = [];
   const flexibleTasks: Task[] = [];
@@ -61,9 +65,18 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
   // 2. For each flexible task, search for candidates
   const stops: OrderedStop[] = [...fixedTasks];
   for (const [i, task] of flexibleTasks.entries()) {
+    console.log("===============================================")
+    console.log(`[generateItinerary] Processing flexible task ${i + 1}/${flexibleTasks.length}:`, task);
     const gapLocation = stops.length > 0 ? stops[stops.length - 1].place.location ?? origin : origin;
     const ll = `${gapLocation.lat},${gapLocation.lon}`;
-    const query = task.required_tags?.[0] || '';
+    // Build a meaningful query: prefer category_hint, then required_tags, then raw text
+    const query = (
+      ((task as any).category_hint as string | undefined)?.replace(/_/g, ' ') ||
+      (task.required_tags && task.required_tags.length ? task.required_tags.join(' ') : undefined) ||
+      ((task as any).raw as string | undefined) ||
+      ''
+    );
+    console.log(`[generateItinerary] Searching places near ${ll} with query: "${query}" (from category_hint/raw/tags)`);
     const placeCandidates = await searchPlaces({ query, ll, limit: 5 });
     // Map PlaceCandidate to CandidatePlace
     let candidates: CandidatePlace[] = placeCandidates.map(pc => ({
@@ -89,8 +102,10 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
     }
     // 3. Analyze reviews if present
     for (const c of candidates) {
+      console.log(`[generateItinerary] Analyzing reviews for candidate:`, c);
       if (c.tags && c.tags.length === 0 && c.review_snippets) {
         const analysis = await analyzeReviews({ placeId: c.id, source: 'openai', reviews: c.review_snippets });
+        console.log(`[generateItinerary] Review analysis for candidate ${c.id}:`, analysis);
         c.tags = analysis.tags.map(t => t.tag);
       }
     }

@@ -14,7 +14,8 @@ router.post('/parse-tasks', async (req, res) => {
   let result = await cache.get(hash);
   if (!result) {
     try {
-      result = await parseTasks(text, location, process.env.LLM_PROVIDER as any || 'mock');
+      const provider = (process.env.LLM_PROVIDER as any) || 'openai';
+      result = await parseTasks(text, location, provider);
       await cache.set(hash, result, 3600); // cache for 1 hour
     } catch (e: any) {
       return res.status(500).json({ error: e.message });

@@ -16,6 +16,7 @@ const adapter = new JSONFile<CacheData>(file);
 const db = new Low<CacheData>(adapter, {});
 
 async function get(key: string): Promise<any | null> {
+  return null;
   await db.read();
   const entry = db.data?.[key];
   if (!entry) return null;
@@ -28,6 +29,7 @@ async function get(key: string): Promise<any | null> {
 }
 
 async function set(key: string, value: any, ttlSeconds: number): Promise<void> {
+  return;
   await db.read();
   db.data = db.data || {};
   db.data[key] = {
@@ -38,6 +40,7 @@ async function set(key: string, value: any, ttlSeconds: number): Promise<void> {
 }
 
 async function has(key: string): Promise<boolean> {
+  return false;
   await db.read();
   const entry = db.data?.[key];
   if (!entry) return false;

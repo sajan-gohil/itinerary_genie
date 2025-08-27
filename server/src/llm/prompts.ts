@@ -6,7 +6,7 @@ User: Convert this input into an array of task objects. Each object must include
  - raw: original text chunk
  - type: "fixed" if an explicit place or address is present, otherwise "flexible"
  - location_hint: optional — the explicit place name or address if present
- - category_hint: optional — a short category string (e.g., "spa", "restaurant", "shopping", "movie_theater", "coffee")
+ - category_hint: a short string that can be used to search for relevant places/POI in foursquare API (e.g., "spa", "restaurant", "shopping", "movie_theater", "coffee shop near me")
  - max_candidates: integer (default 3)
 
 Input:
@@ -16,9 +16,9 @@ Output:
 {
   "tasks": [
     { "id": "t1", "raw": "SPA", "type": "flexible", "category_hint": "spa", "max_candidates": 3 },
-    { "id": "t2", "raw": "shopping", "type": "flexible", "category_hint": "shopping", "max_candidates": 3 },
+    { "id": "t2", "raw": "shopping", "type": "flexible", "category_hint": "shopping mall store", "max_candidates": 3 },
     { "id": "t3", "raw": "dinner at Chandni Chowk", "type": "fixed", "location_hint": "Chandni Chowk", "category_hint": "restaurant", "max_candidates": 3 },
-    { "id": "t4", "raw": "movie", "type": "flexible", "category_hint": "movie_theater", "max_candidates": 3 },
+    { "id": "t4", "raw": "movie", "type": "flexible", "category_hint": "movie theater near me", "max_candidates": 3 },
     { "id": "t5", "raw": "home", "type": "fixed", "location_hint": "home", "category_hint": "home", "max_candidates": 3 }
   ]
 }

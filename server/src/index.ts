@@ -7,6 +7,9 @@ import { postGenerateItinerary } from './api/generateItinerary';
 import { config } from './config';
 import parseTasksRouter from './api/parseTasks';
 import searchPlacesRouter from './api/searchPlaces';
+import routeRouter from './api/route';
+import geocodeRouter from './api/geocode';
+import examplesRouter from './api/examples';
 
 const app = express();
 
@@ -37,6 +40,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
@@ -44,6 +52,8 @@ app.get('/health', (_req, res) => {
 
 
 app.use('/api', parseTasksRouter);
+app.use('/api', geocodeRouter);
+app.use('/api', examplesRouter);
 
 app.post('/api/generate-itinerary', postGenerateItinerary);
 
@@ -56,6 +66,7 @@ app.get('/api/place-details/:source/:placeId', (req, res) => {
 app.post('/api/analyze-reviews', postAnalyzeReviews);
 
 app.use('/api', searchPlacesRouter);
+app.use('/api', routeRouter);
 
 app.listen(config.PORT, () => {
   console.log(`Server running on port ${config.PORT}`);
