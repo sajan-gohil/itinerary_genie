@@ -1,5 +1,7 @@
 import { scoreCandidate, CandidatePlace, Task, UserPrefs } from './scorer';
 import { analyzeReviews } from '../agents/reviewAnalyzer';
+import { checkCandidateRelevance } from '../agents/relevanceChecker';
+import { config } from '../config';
 import { searchPlaces } from '../places/foursquare';
 
 export type GeneratorInput = {
@@ -100,7 +102,35 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
         name: 'No candidate — requires user input'
       }];
     }
-    // 3. Analyze reviews if present
+    // 3. Filter irrelevant candidates using relevance checker (LLM with heuristic fallback)
+    const provider = (process.env.LLM_PROVIDER as any) || (config.LLM_PROVIDER as any) || 'openai';
+    const withRelevance = [] as CandidatePlace[];
+    for (const c of candidates) {
+      try {
+        const rel = await checkCandidateRelevance(task, c, provider);
+        console.log(`[generateItinerary] Relevance for ${c.name} (${c.id}):`, rel);
+        if (rel?.relevant) withRelevance.push(c);
+      } catch (e) {
+        // On unexpected error, keep the candidate to avoid over-filtering
+        console.warn(`[generateItinerary] Relevance check failed for ${c.id}:`, (e as any)?.message || e);
+        withRelevance.push(c);
+      }
+    }
+    candidates = withRelevance;
+    if (candidates.length === 0) {
+      // If all filtered, add a placeholder so pipeline continues
+      candidates = [{
+        id: 'no_relevant_candidate',
+        rating: undefined,
+        review_count: undefined,
+        tags: [],
+        review_snippets: [],
+        location: gapLocation,
+        name: 'No relevant candidate — requires user input/query adjustment'
+      }];
+    }
+
+    // 4. Analyze reviews if present
     for (const c of candidates) {
       console.log(`[generateItinerary] Analyzing reviews for candidate:`, c);
       if (c.tags && c.tags.length === 0 && c.review_snippets) {
@@ -109,14 +139,14 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
         c.tags = analysis.tags.map(t => t.tag);
       }
     }
-    // 4. Score candidates
+    // 5. Score candidates
     const scored = candidates.map(c => ({ c, score: scoreCandidate({ candidatePlace: c, task, userPrefs, currentLocation: gapLocation }) }));
     scored.sort((a, b) => b.score - a.score);
     const top = scored[0]?.c;
     if (top) stops.push({ taskId: task.id, place: top });
   }
 
-  // 5. Optimize order if requested
+  // 6. Optimize order if requested
   let orderedStops = stops;
   if (mode === 'optimize' && orderedStops.length > 2) {
     // Greedy nearest neighbor TSP, respecting fixed tasks at their positions
@@ -140,7 +170,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
     orderedStops = route.map(i => orderedStops[i]);
   }
 
-  // 6. Output
+  // 7. Output
   return {
     orderedStops,
     summaryScores: orderedStops.map(s => scoreCandidate({ candidatePlace: s.place, task: tasks.find(t => t.id === s.taskId)!, userPrefs, currentLocation: origin })),
