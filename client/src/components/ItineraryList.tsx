@@ -26,23 +26,23 @@ const ItineraryList: React.FC<any> = ({ itinerary, stops, setStops, setRoute }) 
   };
 
   return (
-    <div className="p-4 bg-white shadow mt-4 flex flex-col gap-2">
-      <h2 className="text-lg font-semibold mb-2">Stops</h2>
+  <div className="p-3 md:p-4 bg-panel rounded-panel shadow-subtle mt-3 flex flex-col gap-3 text-text-deep border border-muted/40">
+      <h2 className="text-h2 font-lora mb-2">Stops</h2>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={stops.map((s: any) => s.taskId)} strategy={verticalListSortingStrategy}>
           {stops.map((stop: any, i: number) => (
-            <div key={stop.taskId} id={stop.taskId} className="border rounded p-2 mb-2 bg-gray-50 flex flex-col">
-              <span className="font-bold text-blue-700">{stop.place.name || 'Unknown Place'}</span>
-              <span className="text-xs text-gray-500">Rating: {stop.place.rating ?? 'N/A'}</span>
-              <span className="text-xs text-gray-500">Tags: {stop.place.tags?.join(', ') ?? 'N/A'}</span>
-              <span className="text-xs text-gray-500">Distance: {stop.place.distance ?? 'N/A'}</span>
+            <div key={stop.taskId} id={stop.taskId} className="border border-muted/40 rounded-md p-3 bg-cream flex flex-col gap-1">
+              <span className="font-lora text-body leading-tight">{stop.place.name || 'Unknown Place'}</span>
+              <span className="text-small leading-snug text-muted">Rating: {stop.place.rating ?? 'N/A'}</span>
+              <span className="text-small leading-snug text-muted">Tags: {stop.place.tags?.join(', ') ?? 'N/A'}</span>
+              <span className="text-small leading-snug text-muted">Distance: {stop.place.distance ?? 'N/A'}</span>
             </div>
           ))}
         </SortableContext>
       </DndContext>
       {itinerary && (
         <button
-          className="bg-yellow-500 text-white px-2 py-1 rounded mt-2"
+          className="px-3 py-2 rounded-full mt-2 bg-rust text-white shadow-subtle hover:opacity-95 transition-smooth"
           onClick={() => {
             const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
             favs.push(itinerary);

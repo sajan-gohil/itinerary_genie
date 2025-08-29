@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import InputPanel from './components/InputPanel';
 import MapView from './components/MapView';
@@ -12,8 +11,8 @@ const App: React.FC = () => {
   const [stops, setStops] = useState<any[]>([]);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-screen bg-gray-50">
-      <div className="md:w-1/3 w-full md:h-full h-auto z-10">
+  <div className="flex flex-row min-h-screen w-full bg-cream bg-paper">
+      <div className="w-1/3 flex flex-col h-full max-h-screen overflow-y-auto z-10 shadow-subtle bg-panel/80 backdrop-blur-sm">
         <InputPanel
           setItinerary={setItinerary}
           setRoute={setRoute}
@@ -28,7 +27,7 @@ const App: React.FC = () => {
           setRoute={setRoute}
         />
       </div>
-      <div className="md:w-2/3 w-full h-full relative">
+      <div className="w-2/3 flex-1 relative bg-cream overflow-hidden">
         <MapView
           itinerary={itinerary}
           route={route}

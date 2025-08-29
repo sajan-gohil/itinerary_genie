@@ -1,7 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	--bg-cream: #F6F3EA;
+	--panel: #FFFFFF;
+	--sage: #A7C7A9;
+	--teal: #558B7C;
+	--rust: #D88A4A;
+	--text-deep: #3E3328;
+	--muted: #9A8F85;
+}
+
 body {
-	font-family: 'Inter', sans-serif;
+	font-family: 'Inter', system-ui, sans-serif;
+	color: var(--text-deep);
+	background: var(--bg-cream);
+}
+
+/* Focus ring */
+:focus-visible {
+	outline: 2px solid rgba(85, 139, 124, 0.6);
+	outline-offset: 2px;
+}
+
+/* Smooth micro-interactions */
+.transition-smooth {
+	transition: all 180ms ease;
+}
+
+/* Optional paper grain background utility */
+.bg-paper {
+	background-image: url('/assets/paper-grain.png');
+	background-size: 300px 300px;
+	background-repeat: repeat;
+	opacity: 0.98;
 }

@@ -87,11 +87,11 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
   };
 
   return (
-    <div className="p-4 bg-white shadow md:h-screen h-auto flex flex-col gap-4">
+  <div className="p-3 md:p-4 bg-panel rounded-panel shadow-subtle h-auto md:max-h-screen md:overflow-y-auto flex flex-col gap-3 text-text-deep border border-muted/40">
       <div>
-        <label className="block text-sm font-medium mb-1">To-Do List</label>
+        <label className="block text-small font-medium mb-1 font-lora text-text-deep">To-Do List</label>
         <textarea
-          className="w-full border rounded p-2 text-sm"
+          className="w-full border border-muted/40 rounded-md p-2 text-body bg-cream placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
           rows={3}
           placeholder={examples[0] || 'Enter your to-do list, e.g., museum, coffee, dinner'}
           value={todo}
@@ -99,47 +99,47 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
         />
         <div className="flex gap-2 mt-2">
           {examples.map((ex, i) => (
-            <button key={i} className="text-xs bg-gray-100 px-2 py-1 rounded" onClick={() => handleExample(ex)}>{ex}</button>
+            <button key={i} className="text-small bg-cream border border-muted/40 px-2 py-1 rounded-full text-text-deep/80 hover:bg-white transition-smooth" onClick={() => handleExample(ex)}>{ex}</button>
           ))}
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Location</label>
+        <label className="block text-small font-medium mb-1 font-lora">Location</label>
         <div className="flex gap-2">
           <input
-            className="border rounded p-2 text-sm flex-1"
+            className="border border-muted/40 rounded-md p-2 text-body flex-1 bg-white placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
             placeholder="Enter address or city"
             value={location}
             onChange={e => handleLocationInput(e.target.value)}
             disabled={useMyLocation}
           />
-          <button className="bg-blue-500 text-white px-2 py-1 rounded text-xs" onClick={handleUseLocation}>Use my location</button>
+          <button className="bg-sage text-text-deep px-3 py-2 rounded-full text-small shadow-subtle hover:opacity-90 transition-smooth" onClick={handleUseLocation}>Use my location</button>
         </div>
       </div>
       <div className="flex gap-4 items-center">
-        <label className="text-sm">Mode:</label>
+        <label className="text-small">Mode:</label>
         <button
-          className={`px-2 py-1 rounded text-xs ${mode === 'order' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${mode === 'order' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
           onClick={() => setMode('order')}
         >Order-Respect</button>
         <button
-          className={`px-2 py-1 rounded text-xs ${mode === 'optimize' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${mode === 'optimize' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
           onClick={() => setMode('optimize')}
         >Optimize</button>
       </div>
       <div className="flex gap-4 items-center">
-        <label className="text-sm">Transport:</label>
+        <label className="text-small">Transport:</label>
         <button
-          className={`px-2 py-1 rounded text-xs ${transport === 'walking' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${transport === 'walking' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
           onClick={() => setTransport('walking')}
         >Walking</button>
         <button
-          className={`px-2 py-1 rounded text-xs ${transport === 'driving' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${transport === 'driving' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
           onClick={() => setTransport('driving')}
         >Driving</button>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Max Stops: {maxStops}</label>
+        <label className="block text-small font-medium mb-1">Max Stops: {maxStops}</label>
         <input
           type="range"
           min={2}
@@ -150,7 +150,7 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
         />
       </div>
       <button
-        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+        className="bg-rust text-white px-5 py-2.5 rounded-full mt-2 shadow-subtle hover:opacity-95 transition-smooth"
         onClick={handleGenerate}
       >Generate</button>
     </div>
