@@ -28,7 +28,7 @@ export async function searchPlaces({
   sort?: string;
 }): Promise<PlaceCandidate[]> {
   // Build query params
-  console.log("[searchPlaces] Building query params...", category, ll, query, limit, radius, sort);
+  // console.log("[searchPlaces] Building query params...", category, ll, query, limit, radius, sort);
   const params = new URLSearchParams();
   if (ll) params.append("ll", ll);
   if (query || category) params.append("query", query || category || "");
@@ -46,9 +46,9 @@ export async function searchPlaces({
     },
   };
 
-  console.log("[searchPlaces] URL:", url);
+  // console.log("[searchPlaces] URL:", url);
   const res = await fetch(url, options);
-  console.log("[searchPlaces] Response status:", res.status);
+  // console.log("[searchPlaces] Response status:", res.status);
   if (!res.ok) throw new Error(`Foursquare API error: ${res.status}`);
   const data = await res.json();
   // console.log('[searchPlaces] Raw data:', JSON.stringify(data, null, 2));
@@ -93,7 +93,7 @@ export async function getPlaceDetails(fsq_id: string): Promise<any> {
   if (!res.ok) throw new Error(`Foursquare API error: ${res.status}`);
   const data = await res.json();
   // Log raw details for debugging
-  console.log('[getPlaceDetails] data len:', JSON.stringify(data, null, 2));
+  // console.log('[getPlaceDetails] data len:', JSON.stringify(data, null, 2));
   // Map relevant fields
   return {
     id: data.fsq_place_id || data.fsq_id,

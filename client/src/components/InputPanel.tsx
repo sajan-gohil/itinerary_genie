@@ -87,70 +87,88 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
   };
 
   return (
-  <div className="p-3 md:p-4 bg-panel rounded-panel shadow-subtle h-auto md:max-h-screen md:overflow-y-auto flex flex-col gap-3 text-text-deep border border-muted/40">
+  <div className="input-panel">
       <div>
-        <label className="block text-small font-medium mb-1 font-lora text-text-deep">To-Do List</label>
+        <label className="todo-label">To-Do List</label>
         <textarea
-          className="w-full border border-muted/40 rounded-md p-2 text-body bg-cream placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
+          className="todo-textarea"
           rows={3}
           placeholder={examples[0] || 'Enter your to-do list, e.g., museum, coffee, dinner'}
           value={todo}
           onChange={e => setTodo(e.target.value)}
         />
-        <div className="flex gap-2 mt-2">
+        <div className="example-buttons">
           {examples.map((ex, i) => (
-            <button key={i} className="text-small bg-cream border border-muted/40 px-2 py-1 rounded-full text-text-deep/80 hover:bg-white transition-smooth" onClick={() => handleExample(ex)}>{ex}</button>
+            <button
+              key={i}
+              className="example-btn"
+              onClick={() => handleExample(ex)}
+            >
+              {ex}
+            </button>
           ))}
         </div>
       </div>
       <div>
-        <label className="block text-small font-medium mb-1 font-lora">Location</label>
-        <div className="flex gap-2">
+        <label className="location-label">Location</label>
+        <div className="location-row">
           <input
-            className="border border-muted/40 rounded-md p-2 text-body flex-1 bg-white placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
+            className="location-input"
             placeholder="Enter address or city"
             value={location}
             onChange={e => handleLocationInput(e.target.value)}
             disabled={useMyLocation}
           />
-          <button className="bg-sage text-text-deep px-3 py-2 rounded-full text-small shadow-subtle hover:opacity-90 transition-smooth" onClick={handleUseLocation}>Use my location</button>
+          <button className="location-btn" onClick={handleUseLocation}>Use my location</button>
         </div>
       </div>
       <div className="flex gap-4 items-center">
-        <label className="text-small">Mode:</label>
-        <button
-          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${mode === 'order' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
-          onClick={() => setMode('order')}
-        >Order-Respect</button>
-        <button
-          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${mode === 'optimize' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
-          onClick={() => setMode('optimize')}
-        >Optimize</button>
+        <label className="mode-label">Mode:</label>
+        <div className="mode-buttons">
+          <button
+            className={`mode-btn${mode === 'order' ? ' selected' : ''}`}
+            onClick={() => setMode('order')}
+          >
+            Order-Respect
+          </button>
+          <button
+            className={`mode-btn${mode === 'optimize' ? ' selected' : ''}`}
+            onClick={() => setMode('optimize')}
+          >
+            Optimize
+          </button>
+        </div>
       </div>
       <div className="flex gap-4 items-center">
-        <label className="text-small">Transport:</label>
-        <button
-          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${transport === 'walking' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
-          onClick={() => setTransport('walking')}
-        >Walking</button>
-        <button
-          className={`px-3 py-1.5 rounded-full text-small transition-smooth ${transport === 'driving' ? 'bg-teal text-white' : 'bg-cream border border-muted/40 text-text-deep'}`}
-          onClick={() => setTransport('driving')}
-        >Driving</button>
+        <label className="transport-label">Transport:</label>
+        <div className="transport-buttons">
+          <button
+            className={`transport-btn${transport === 'walking' ? ' selected' : ''}`}
+            onClick={() => setTransport('walking')}
+          >
+            Walking
+          </button>
+          <button
+            className={`transport-btn${transport === 'driving' ? ' selected' : ''}`}
+            onClick={() => setTransport('driving')}
+          >
+            Driving
+          </button>
+        </div>
       </div>
       <div>
-        <label className="block text-small font-medium mb-1">Max Stops: {maxStops}</label>
+        <label className="maxstops-label">Max Stops: {maxStops}</label>
         <input
           type="range"
           min={2}
           max={12}
           value={maxStops}
           onChange={e => setMaxStops(Number(e.target.value))}
-          className="w-full"
+          className="maxstops-range"
         />
       </div>
       <button
-        className="bg-rust text-white px-5 py-2.5 rounded-full mt-2 shadow-subtle hover:opacity-95 transition-smooth"
+        className="generate-btn"
         onClick={handleGenerate}
       >Generate</button>
     </div>

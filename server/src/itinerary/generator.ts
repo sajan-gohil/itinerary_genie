@@ -67,8 +67,8 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
   // 2. For each flexible task, search for candidates
   const stops: OrderedStop[] = [...fixedTasks];
   for (const [i, task] of flexibleTasks.entries()) {
-    console.log("===============================================")
-    console.log(`[generateItinerary] Processing flexible task ${i + 1}/${flexibleTasks.length}:`, task);
+    // console.log("===============================================")
+    // console.log(`[generateItinerary] Processing flexible task ${i + 1}/${flexibleTasks.length}:`, task);
     const gapLocation = stops.length > 0 ? stops[stops.length - 1].place.location ?? origin : origin;
     const ll = `${gapLocation.lat},${gapLocation.lon}`;
     // Build a meaningful query: prefer category_hint, then required_tags, then raw text
@@ -78,7 +78,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
       ((task as any).raw as string | undefined) ||
       ''
     );
-    console.log(`[generateItinerary] Searching places near ${ll} with query: "${query}" (from category_hint/raw/tags)`);
+    // console.log(`[generateItinerary] Searching places near ${ll} with query: "${query}" (from category_hint/raw/tags)`);
     const placeCandidates = await searchPlaces({ query, ll, limit: 5 });
     // Map PlaceCandidate to CandidatePlace
     let candidates: CandidatePlace[] = placeCandidates.map(pc => ({

@@ -11,8 +11,8 @@ const App: React.FC = () => {
   const [stops, setStops] = useState<any[]>([]);
 
   return (
-  <div className="flex flex-row min-h-screen w-full bg-cream bg-paper">
-      <div className="w-1/3 flex flex-col h-full max-h-screen overflow-y-auto z-10 shadow-subtle bg-panel/80 backdrop-blur-sm">
+  <div className="flex flex-row min-h-screen w-full bg-panel bg-paper">
+      <div className="w-1/3 flex flex-col h-full max-h-screen overflow-y-auto z-10 shadow-subtle bg-panel/80 backdrop-blur-sm left-panel">
         <InputPanel
           setItinerary={setItinerary}
           setRoute={setRoute}

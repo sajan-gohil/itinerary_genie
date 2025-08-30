@@ -21,7 +21,7 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
     (mapboxgl as any).config.TELEMETRY = false;
     mapInstance.current = new mapboxgl.Map({
       container: mapRef.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'mapbox://styles/mapbox/light-v10', // Light theme for new color scheme
       center: [0, 0],
       zoom: 2,
     });
@@ -38,18 +38,18 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
         });
         const roadLineLayers = (map.getStyle().layers || []).filter(l => l.type === 'line' && (l.id.includes('road') || l.id.includes('street')));
         roadLineLayers.forEach(l => {
-          try { map.setPaintProperty(l.id, 'line-color', '#CFC7BE'); } catch {}
+          try { map.setPaintProperty(l.id, 'line-color', '#02D8E9'); } catch {}
           try { map.setPaintProperty(l.id, 'line-opacity', 0.75); } catch {}
         });
-        // Landcover/park: slightly greener
-        const greenish = ['#CFE3D0', '#B9D5BC'];
+        // Landcover/park: lighter green/aqua
+        const greenish = ['#eaffea', '#c8f7e0', '#a2e3d8'];
         (map.getStyle().layers || []).forEach((l, i) => {
           if (l.type === 'fill' && (l.id.includes('landcover') || l.id.includes('park') || l.id.includes('landuse'))){
             try { map.setPaintProperty(l.id, 'fill-color', greenish[i % greenish.length]); } catch {}
             try { map.setPaintProperty(l.id, 'fill-opacity', 0.6); } catch {}
           }
           if (l.type === 'fill' && l.id.includes('water')){
-            try { map.setPaintProperty(l.id, 'fill-color', '#DDE6EC'); } catch {}
+            try { map.setPaintProperty(l.id, 'fill-color', '#fff9e0'); } catch {}
             try { map.setPaintProperty(l.id, 'fill-opacity', 0.9); } catch {}
           }
         });
@@ -140,13 +140,13 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
       stopCoords.forEach((lngLat, idx) => {
         const el = document.createElement('div');
         el.className = 'w-8 h-8 rounded-full shadow-subtle ring-2 ring-cream bg-rust grid place-items-center hover:scale-[1.03] transition-smooth';
-        el.innerHTML = '<img src="/assets/camera.svg" alt="stop" class="w-4 h-4 opacity-95" />';
+        el.innerHTML = '<img src="/assets/leaf.svg" alt="stop" class="w-4 h-4 opacity-95" />';
         const m = new mapboxgl.Marker({ element: el as any })
           .setLngLat(lngLat)
           .setPopup(new mapboxgl.Popup({ offset: 20, closeButton: false, className: 'rounded-panel' })
-            .setHTML(`<div style="background:rgba(255,255,255,0.92);padding:12px;border-radius:8px;">
-              <div style="font-family:Lora,serif;font-size:15px;color:#3E3328;line-height:1.2;">${(stops[idx]?.place?.name || `Stop ${idx + 1}`)}</div>
-            </div>`))
+            .setHTML(`<div class="bg-panel p-3 rounded-md">
+  <div class="font-lora text-body text-text-deep leading-tight">${(stops[idx]?.place?.name || `Stop ${idx + 1}`)}</div>
+</div>`))
           .addTo(map);
         markersRef.current.push(m);
         points.push(lngLat);

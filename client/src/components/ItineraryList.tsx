@@ -31,7 +31,7 @@ const ItineraryList: React.FC<any> = ({ itinerary, stops, setStops, setRoute }) 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={stops.map((s: any) => s.taskId)} strategy={verticalListSortingStrategy}>
           {stops.map((stop: any, i: number) => (
-            <div key={stop.taskId} id={stop.taskId} className="border border-muted/40 rounded-md p-3 bg-cream flex flex-col gap-1">
+            <div key={stop.taskId} id={stop.taskId} className="border border-muted/40 rounded-md p-3 bg-panel flex flex-col gap-1">
               <span className="font-lora text-body leading-tight">{stop.place.name || 'Unknown Place'}</span>
               <span className="text-small leading-snug text-muted">Rating: {stop.place.rating ?? 'N/A'}</span>
               <span className="text-small leading-snug text-muted">Tags: {stop.place.tags?.join(', ') ?? 'N/A'}</span>
@@ -42,13 +42,15 @@ const ItineraryList: React.FC<any> = ({ itinerary, stops, setStops, setRoute }) 
       </DndContext>
       {itinerary && (
         <button
-          className="px-3 py-2 rounded-full mt-2 bg-rust text-white shadow-subtle hover:opacity-95 transition-smooth"
+          className="px-4 py-3 rounded-md mt-4 bg-rust text-white shadow-subtle hover:opacity-95 transition-smooth"
           onClick={() => {
             const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
             favs.push(itinerary);
             localStorage.setItem('favorites', JSON.stringify(favs));
           }}
-        >Save as favorite</button>
+        >
+          Save as favorite
+        </button>
       )}
     </div>
   );
