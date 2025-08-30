@@ -29,19 +29,24 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
     mapInstance.current.on('load', () => {
       const map = mapInstance.current!;
       try {
-        // Labels and roads: lower saturation/opacity
+        // Find all road layers and update their color
+        const roadLayers = (map.getStyle().layers || [])
+          .filter(l => l.id.includes('road') && l.type === 'line')
+          .map(l => l.id);
+        roadLayers.forEach(layerId => {
+          try { map.setPaintProperty(layerId, 'line-color', '#69e4ed'); } catch {}
+          try { map.setPaintProperty(layerId, 'line-opacity', 0.75); } catch {}
+        });
+
+        // Labels and parks as before
         const labelLayers = map.getStyle().layers?.filter(l => l.type === 'symbol') || [];
         labelLayers.forEach(l => {
           try { map.setPaintProperty(l.id, 'text-color', '#6F6A62'); } catch {}
           try { map.setPaintProperty(l.id, 'text-halo-color', '#FFFFFF'); } catch {}
           try { map.setPaintProperty(l.id, 'text-opacity', 0.82); } catch {}
         });
-        const roadLineLayers = (map.getStyle().layers || []).filter(l => l.type === 'line' && (l.id.includes('road') || l.id.includes('street')));
-        roadLineLayers.forEach(l => {
-          try { map.setPaintProperty(l.id, 'line-color', '#02D8E9'); } catch {}
-          try { map.setPaintProperty(l.id, 'line-opacity', 0.75); } catch {}
-        });
-        // Landcover/park: lighter green/aqua
+
+        // Parks/landcover/landuse
         const greenish = ['#eaffea', '#c8f7e0', '#a2e3d8'];
         (map.getStyle().layers || []).forEach((l, i) => {
           if (l.type === 'fill' && (l.id.includes('landcover') || l.id.includes('park') || l.id.includes('landuse'))){
@@ -73,21 +78,22 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
     map.fitBounds(b, { padding: 40, duration: 600, maxZoom: 15 });
   };
 
+  
   // Draw route + markers when route or stops change
   useEffect(() => {
     const map = mapInstance.current;
     if (!map || !MAPBOX_TOKEN) return;
 
+    // Remove old route layers and source immediately when route or stops change
+    if (map.getLayer('route-line')) map.removeLayer('route-line');
+    if (map.getLayer('route-line-glow')) map.removeLayer('route-line-glow');
+    if (map.getSource('route')) map.removeSource('route');
+    clearMarkers();
+
     // Wait for map style
     const ensureReady = () => (map as any).isStyleLoaded?.();
     const draw = () => {
-      // Remove existing route layer/source
-      if (map.getLayer('route-line')) map.removeLayer('route-line');
-      if (map.getSource('route')) map.removeSource('route');
-      clearMarkers();
-
       const points: [number, number][] = [];
-
       // Decode route polyline (Mapbox Directions returns polyline by default per server config)
       if (route?.polyline) {
         try {
@@ -108,8 +114,8 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
               0, '#A7C7A9',
               1, '#558B7C'
             ];
-            map.addLayer({ id: 'route-line-glow', type: 'line', source: 'route', paint: { 'line-color': '#A7C7A9', 'line-width': 8, 'line-opacity': 0.25 } });
-            map.addLayer({ id: 'route-line', type: 'line', source: 'route', paint: { 'line-gradient': gradient as any, 'line-width': 5, 'line-opacity': 0.9 } });
+            map.addLayer({ id: 'route-line-glow', type: 'line', source: 'route', paint: { 'line-color': '#a0c9a3', 'line-width': 8, 'line-opacity': 0.25 } });
+            map.addLayer({ id: 'route-line', type: 'line', source: 'route', paint: { 'line-width': 5, 'line-opacity': 0.9 } });
             points.push(...decoded);
           }
         } catch (e) {
@@ -121,8 +127,8 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
       const origin = itinerary?.routeRequest?.origin;
       if (origin && typeof origin.lat === 'number' && typeof origin.lon === 'number') {
         const el = document.createElement('div');
-        el.className = 'w-8 h-8 rounded-full shadow-subtle ring-2 ring-cream bg-sage grid place-items-center';
-        el.innerHTML = '<img src="/assets/leaf.svg" alt="origin" class="w-4 h-4 opacity-90" />';
+        el.className = 'w-8 h-8 bg-sage grid place-items-center';
+        el.innerHTML = '<img src="/assets/camera.svg" alt="origin" class="w-4 h-4 opacity-90" />';
         const m = new mapboxgl.Marker({ element: el as any })
           .setLngLat([origin.lon, origin.lat])
           .addTo(map);
@@ -139,7 +145,7 @@ const MapView: React.FC<any> = ({ itinerary, route, stops }) => {
         : [];
       stopCoords.forEach((lngLat, idx) => {
         const el = document.createElement('div');
-        el.className = 'w-8 h-8 rounded-full shadow-subtle ring-2 ring-cream bg-rust grid place-items-center hover:scale-[1.03] transition-smooth';
+        el.className = 'w-8 h-8 bg-rust grid place-items-center transition-smooth';
         el.innerHTML = '<img src="/assets/leaf.svg" alt="stop" class="w-4 h-4 opacity-95" />';
         const m = new mapboxgl.Marker({ element: el as any })
           .setLngLat(lngLat)

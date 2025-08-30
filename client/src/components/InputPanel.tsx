@@ -26,8 +26,28 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
     if (navigator.geolocation) {
       setLoading(true);
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
           setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          // Reverse geocode to get address string
+          try {
+            const result = await geocodeAddress(`${pos.coords.latitude},${pos.coords.longitude}`);
+            // Try to use a general area or place name if available
+            if (result) {
+              if (result.name) {
+                setLocation(result.name);
+              } else if (result.city) {
+                setLocation(result.city);
+              } else if (result.address) {
+                setLocation(result.address);
+              } else {
+                setLocation('Your area');
+              }
+            } else {
+              setLocation('Your area');
+            }
+          } catch {
+            setLocation('Your area');
+          }
           setLoading(false);
         },
         (err) => {
@@ -110,7 +130,7 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
         </div>
       </div>
       <div>
-        <label className="location-label">Location</label>
+        <label className="location-label">Starting Location</label>
         <div className="location-row">
           <input
             className="location-input"
@@ -129,7 +149,7 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
             className={`mode-btn${mode === 'order' ? ' selected' : ''}`}
             onClick={() => setMode('order')}
           >
-            Order-Respect
+            In Order
           </button>
           <button
             className={`mode-btn${mode === 'optimize' ? ' selected' : ''}`}
@@ -139,7 +159,7 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
           </button>
         </div>
       </div>
-      <div className="flex gap-4 items-center">
+      {/* <div className="flex gap-4 items-center">
         <label className="transport-label">Transport:</label>
         <div className="transport-buttons">
           <button
@@ -155,7 +175,7 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
             Driving
           </button>
         </div>
-      </div>
+      </div> */}
       <div>
         <label className="maxstops-label">Max Stops: {maxStops}</label>
         <input

@@ -126,7 +126,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
         tags: [],
         review_snippets: [],
         location: gapLocation,
-        name: 'No relevant candidate — requires user input/query adjustment'
+        name: 'No relevant candidate — requires user input'
       }];
     }
 
