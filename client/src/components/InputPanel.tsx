@@ -7,8 +7,8 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
   const [useMyLocation, setUseMyLocation] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [mode, setMode] = useState<'order' | 'optimize'>('order');
-  const [transport, setTransport] = useState<'walking' | 'driving'>('walking');
-  const [maxStops, setMaxStops] = useState(6);
+  const [transport, setTransport] = useState<'walking' | 'driving'>('driving');
+  // Remove maxStops state
   const [debounceTimer, setDebounceTimer] = useState<any>(null);
   const [examples, setExamples] = useState<string[]>([]);
 
@@ -91,7 +91,10 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
         setLoading(false);
         return;
       }
-  const parsed = await parseTasks(todo, coords ? { lat: coords.lat, lon: coords.lon } : undefined);
+      // Calculate maxStops from the number of input items
+      const inputItems = todo.split(',').map(item => item.trim()).filter(Boolean);
+      const maxStops = inputItems.length;
+      const parsed = await parseTasks(todo, coords ? { lat: coords.lat, lon: coords.lon } : undefined);
       const tasks = parsed.tasks.slice(0, maxStops);
       console.log("Parsed tasks = ", tasks);
       const itinerary = await generateItinerary({ tasks, origin, mode, transportMode: transport });
@@ -112,7 +115,7 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
         <label className="todo-label">To-Do List</label>
         <textarea
           className="todo-textarea"
-          rows={3}
+          rows={2}
           placeholder={examples[0] || 'Enter your to-do list, e.g., museum, coffee, dinner'}
           value={todo}
           onChange={e => setTodo(e.target.value)}
@@ -176,17 +179,6 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
           </button>
         </div>
       </div> */}
-      <div>
-        <label className="maxstops-label">Max Stops: {maxStops}</label>
-        <input
-          type="range"
-          min={2}
-          max={12}
-          value={maxStops}
-          onChange={e => setMaxStops(Number(e.target.value))}
-          className="maxstops-range"
-        />
-      </div>
       <button
         className="generate-btn"
         onClick={handleGenerate}

@@ -1,7 +1,8 @@
 import { getLLMCompletion } from '../llm/adapter';
 
-export type ReviewAnalysisTag = {
-  tag: string;
+
+export type ReviewAspectScore = {
+  aspect: string;
   score: number;
 };
 
@@ -9,98 +10,59 @@ export type AnalyzeReviewsInput = {
   placeId: string;
   source: string;
   reviews: string[];
+  userQuery?: string;
 };
 
 export type AnalyzeReviewsOutput = {
   placeId: string;
-  tags: ReviewAnalysisTag[];
+  aspectScores: ReviewAspectScore[];
+  rating: number;
   confidence: number;
 };
 
-const TAGS = [
-  "chill",
-  "quick_bite",
-  "family_friendly",
-  "romantic",
-  "noisy",
-  "entertaining",
-  "fast_service",
-  "reservation_recommended",
-  "budget_friendly",
-  "fine_dining",
-  "outdoor_seating",
-  "pure_veg",
-  "non_veg_friendly",
-  "street_food",
-  "local_cuisine",
-  "regional_specialty",
-  "late_night_open",
-  "early_morning_open",
-  "brunch_spot",
-  "delivery_available",
-  "takeaway_friendly",
-  "alcohol_served",
-  "craft_beer",
-  "rooftop",
-  "pet_friendly",
-  "kids_play_area",
-  "wheelchair_accessible",
-  "parking_available",
-  "valet_parking",
-  "live_music",
-  "standup_comedy",
-  "cozy_interior",
-  "luxury",
-  "eco_friendly",
-  "organic_options",
-  "health_conscious",
-  "gluten_free_options",
-  "vegan_options",
-  "halal_certified",
-  "wifi_available",
-  "work_friendly",
-  "power_outlets",
-  "good_for_groups",
-  "date_night",
-  "solo_friendly",
-  "photogenic",
-  "historic_place",
-  "religious_site",
-  "safety_at_night",
-  "crowded_on_weekends",
-  "quiet_workspace"
-]
 
 
-function buildPrompt(placeId: string, reviews: string[]): string {
-  return `System: You are a review classifier. Read the list of short review snippets and output strict JSON:\n\n{\n  "placeId": "${placeId}",\n  "tags": [\n    { "tag": "chill", "score": 0.0-1.0 },\n    ...\n  ],\n  "confidence": 0.0-1.0\n}\n\nOnly include tags from this allowed list:\n["chill", "quick_bite", "family_friendly", "romantic", "noisy", "fast_service", "reservation_recommended", "budget_friendly", "fine_dining", "outdoor_seating"]\n\nUser: Here are reviews: ${JSON.stringify(reviews)}`;
+function buildPrompt(placeId: string, reviews: string[], userQuery?: string): string {
+  const aspects = [
+    "might fulfill user need",
+    "positiveness of reviews",
+    "convenience",
+    "cleanliness",
+    "service quality"
+  ];
+  return `System: You are a review analyzer. Read the concatenated review text and output strict JSON:\n\n{\n  "placeId": "${placeId}",\n  "aspectScores": [\n    { "aspect": "might fulfill user need", "score": 1-5 },\n    { "aspect": "positiveness of reviews", "score": 1-5 },\n    { "aspect": "convenience", "score": 1-5 },\n    { "aspect": "cleanliness", "score": 1-5 },\n    { "aspect": "service quality", "score": 1-5 }\n  ],\n  "confidence": 0.0-1.0\n}\n\nUser query: ${userQuery || ''}\nUser: Here are the reviews (concatenated):\n${reviews.join(' ')}\n\nScore each aspect from 1 (bad) to 5 (excellent), decimals allowed. Average the scores for overall rating.`;
 }
 
-export async function analyzeReviews({ placeId, source, reviews }: AnalyzeReviewsInput): Promise<AnalyzeReviewsOutput> {
+
+export async function analyzeReviews({ placeId, source, reviews, userQuery }: AnalyzeReviewsInput): Promise<AnalyzeReviewsOutput> {
   if (!Array.isArray(reviews) || reviews.length === 0) {
-    return { placeId, tags: [], confidence: 0.2 };
+    return { placeId, aspectScores: [], rating: 0, confidence: 0.2 };
   }
-  const prompt = buildPrompt(placeId, reviews);
-  let tags: ReviewAnalysisTag[] = [];
+  const prompt = buildPrompt(placeId, reviews, userQuery);
+  let aspectScores: ReviewAspectScore[] = [];
   let confidence = 0.8;
+  let rating = 0;
   try {
-  const response = await getLLMCompletion({ prompt, provider: source as any });
-    tags = JSON.parse(response);
-    // Validate tags
-    tags = Array.isArray(tags)
-      ? tags.filter(
-          (t) =>
-            typeof t.tag === 'string' &&
-            TAGS.includes(t.tag) &&
-            typeof t.score === 'number' &&
-            t.score >= 0 &&
-            t.score <= 1
+    let response = await getLLMCompletion({ prompt, provider: source as any });
+    // Remove markdown code block markers if present
+    response = response.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(response);
+    aspectScores = Array.isArray(parsed.aspectScores)
+      ? parsed.aspectScores.filter(
+          (a: any) => typeof a.aspect === 'string' && typeof a.score === 'number' && a.score >= 1 && a.score <= 5
         )
       : [];
-    confidence = tags.length > 0 ? 0.9 : 0.5;
+    if (aspectScores.length > 0) {
+      rating = aspectScores.reduce((sum, a) => sum + a.score, 0) / aspectScores.length;
+      confidence = parsed.confidence ?? 0.9;
+    } else {
+      confidence = 0.5;
+    }
   } catch (e) {
-    tags = [];
+    aspectScores = [];
+    rating = 0;
     confidence = 0.3;
+    console.warn(`[analyzeReviews] Failed to analyze reviews for ${placeId}:`, (e as any)?.message || e);
   }
-  return { placeId, tags, confidence };
+  return { placeId, aspectScores, rating, confidence };
 }

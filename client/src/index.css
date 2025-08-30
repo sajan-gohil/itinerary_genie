@@ -53,6 +53,13 @@ body {
   margin-bottom: 16px; /* Add spacing between elements */
 }
 
+
+/* Reduce gap and padding around Stops header */
+.stops-list-section h3 {
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+}
+
 /* InputPanel styles migrated from inline classes */
 .input-panel {
   padding: 1rem;
@@ -67,7 +74,7 @@ body {
   gap: 1rem;
   color: var(--text-deep);
   border: 1px solid var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   background: var(--panel);
 }
 .todo-label {
@@ -84,11 +91,13 @@ body {
   width: 100%;
   border: 1px solid var(--muted);
   border-radius: 0.2rem;
-  padding: 0.2rem;
+  padding: 0.15rem;
   font-size: 0.8rem;
   background: var(--bg-cream);
   color: var(--text-deep);
   box-sizing: border-box;
+  min-height: 1em;
+  max-height: 3em;
 }
 .example-buttons {
   display: flex;
@@ -106,6 +115,7 @@ body {
   transition: all 180ms ease;
   /* margin-left: 0.1rem; */
   box-shadow: 0 0 8px 0 rgba(162,227,216,0.10);
+  /* max-height: 3em; */
 }
 .example-btn:hover {
   background: #eaffea;
@@ -114,11 +124,11 @@ body {
   filter: brightness(1.04);
 }
 .location-label {
-  display: block;
+  /* display: block; */
   font-size: 0.85rem;
   font-weight: 500;
   margin-bottom: 0.25rem;
-  font-family: 'Lora', serif;
+  /* font-family: 'Lora', serif; */
 }
 .location-row {
   display: flex;
@@ -128,7 +138,7 @@ body {
 .location-input {
   border: 1px solid var(--muted);
   border-radius: 0.5rem;
-  padding: 0.35rem;
+  padding: 0.2rem;
   font-size: 0.9rem;
   flex: 1;
   background: #fff;
@@ -214,9 +224,9 @@ body {
 .generate-btn {
   background: var(--rust);
   color: #3e3328;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
   box-shadow: 0 1px 4px rgba(60,60,60,0.08);
   transition: all 180ms ease;
   border: 1px solid var(--rust);
@@ -228,6 +238,24 @@ body {
   filter: brightness(1.04);
 }
 
+/* Layout for left panel: split top/bottom */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.todo-panel-section {
+  flex: 1 1 65%;
+  min-height: 0;
+  overflow-y: auto;
+}
+.stops-list-section {
+  flex: 1 1 35%;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+
 /* Reduce size of key action buttons */
 .location-btn,
 .mode-btn,
@@ -236,6 +264,28 @@ body {
   padding: 0.35rem 0.6rem;
   border-radius: 0.35rem;
 }
+
+
+
+/* ItineraryList stop card spacing */
+.itinerary-stops-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-bottom: 5%;
+}
+.itinerary-stop-card {
+  margin-bottom: 4px;
+  border-radius: 0.2rem;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.3);
+}
+.itinerary-stop-card:last-child {
+  margin-bottom: 0;
+}
+
 
 body, input, textarea, button, label, .input-panel, .todo-label, .location-label, .mode-label, .transport-label, .maxstops-label, .example-btn, .location-btn, .mode-btn, .transport-btn, .generate-btn {
   font-family: 'Didact Gothic', sans-serif !important;

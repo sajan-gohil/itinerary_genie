@@ -2,6 +2,8 @@ import { scoreCandidate, CandidatePlace, Task, UserPrefs } from './scorer';
 import { analyzeReviews } from '../agents/reviewAnalyzer';
 import { checkCandidateRelevance } from '../agents/relevanceChecker';
 import { config } from '../config';
+import { fetchGoogleReviews } from '../places/google';
+import { fetchGooglePlaceId } from '../places/googlePlaceId';
 import { searchPlaces } from '../places/foursquare';
 
 export type GeneratorInput = {
@@ -79,17 +81,37 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
       ''
     );
     // console.log(`[generateItinerary] Searching places near ${ll} with query: "${query}" (from category_hint/raw/tags)`);
-    const placeCandidates = await searchPlaces({ query, ll, limit: 5 });
-    // Map PlaceCandidate to CandidatePlace
-    let candidates: CandidatePlace[] = placeCandidates.map(pc => ({
-      id: pc.id,
-      rating: pc.rating,
-      review_count: undefined,
-      tags: pc.categories,
-      review_snippets: [],
-      location: { lat: pc.lat, lon: pc.lon },
-      name: pc.name
-    }));
+    const placeCandidates = await searchPlaces({ query, ll, limit: 3 });
+    // Map PlaceCandidate to CandidatePlace, add raw and city from task
+    let candidates: CandidatePlace[] = placeCandidates.map(pc => {
+      // Concatenate address fields except formatted_address
+      const addressParts = [
+        (pc as any).address,
+        (pc as any).locality,
+        (pc as any).region,
+        (pc as any).postcode,
+        (pc as any).admin_region,
+        (pc as any).post_town,
+        (pc as any).po_box,
+        (pc as any).country
+      ].filter(Boolean);
+      const address = addressParts.join(', ');
+      const formatted_address = (pc as any).formatted_address || '';
+      return {
+        id: pc.id,
+        rating: pc.rating,
+        review_count: undefined,
+        tags: pc.categories,
+        review_snippets: [],
+        location: { lat: pc.lat, lon: pc.lon },
+        name: pc.name,
+        raw: (task as any).raw,
+        city: (task as any).city || formatted_address || (pc as any).region || '',
+        country: (pc as any).country || '',
+        address,
+        formatted_address
+      };
+    });
     // If no candidates, insert placeholder
     if (candidates.length === 0) {
       candidates = [{
@@ -108,7 +130,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
     for (const c of candidates) {
       try {
         const rel = await checkCandidateRelevance(task, c, provider);
-        console.log(`[generateItinerary] Relevance for ${c.name} (${c.id}):`, rel);
+        // console.log(`[generateItinerary] Relevance for ${c.name} (${c.id}):`, rel);
         if (rel?.relevant) withRelevance.push(c);
       } catch (e) {
         // On unexpected error, keep the candidate to avoid over-filtering
@@ -130,13 +152,33 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
       }];
     }
 
-    // 4. Analyze reviews if present
+    // 4. Fetch reviews from Google Maps and analyze
     for (const c of candidates) {
-      console.log(`[generateItinerary] Analyzing reviews for candidate:`, c);
-      if (c.tags && c.tags.length === 0 && c.review_snippets) {
-        const analysis = await analyzeReviews({ placeId: c.id, source: 'openai', reviews: c.review_snippets });
-        console.log(`[generateItinerary] Review analysis for candidate ${c.id}:`, analysis);
-        c.tags = analysis.tags.map(t => t.tag);
+      // console.log(`[generateItinerary] Analyzing reviews for candidate:`, c);
+      let reviews: string[] = [];
+      // Try to fetch Google reviews using name and address
+      try {
+        let placeId: string | null = null;
+        console.log("C = = ", c)
+        if (c.name && (c as any).address) {
+          placeId = await fetchGooglePlaceId(c.name, (c as any).address);
+        }
+        if (placeId) {
+          reviews = await fetchGoogleReviews(placeId);
+        }
+      } catch (err: any) {
+        console.warn(`[generateItinerary] Could not fetch Google reviews for ${c.name}:`, err && typeof err === 'object' && 'message' in err ? (err as any).message : String(err));
+      }
+      // Fallback to existing review_snippets if Google reviews not available
+      if ((!reviews || reviews.length === 0) && c.review_snippets && c.review_snippets.length > 0) {
+        reviews = c.review_snippets;
+      }
+      if (reviews && reviews.length > 0) {
+        const userQuery = (task as any).raw || '';
+        const analysis = await analyzeReviews({ placeId: c.id, source: 'openai', reviews, userQuery });
+        c.rating = analysis.rating;
+        // Optionally, you can store aspect scores or confidence if needed
+        console.log(`[generateItinerary] Review analysis for ${c.name} (${c.id}):`, analysis);
       }
     }
     // 5. Score candidates

@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 export async function postGenerateItinerary(req: Request, res: Response) {
   const { tasks, origin, mode, transportMode, userPrefs } = req.body || {};
-  console.log("[postGenerateItinerary] Received generate-itinerary request with body:", req.body);
+  // console.log("[postGenerateItinerary] Received generate-itinerary request with body:", req.body);
   if (!Array.isArray(tasks) || !origin || typeof origin.lat !== 'number' || typeof origin.lon !== 'number' || !mode || !transportMode) {
     return res.status(400).json({ error: 'Invalid input' });
   }

@@ -54,6 +54,8 @@ export async function searchPlaces({
   // console.log('[searchPlaces] Raw data:', JSON.stringify(data, null, 2));
   const candidates: PlaceCandidate[] = (data.results || []).map(
     (place: any) => {
+      // console.log("[searchPlaces] Raw place data:", JSON.stringify(place, null, 2));
+      // console.log("[searchPlaces] Raw place data:", place.location?.formatted_address);
       const mapped = {
         id: place.fsq_place_id || place.fsq_id,
         name: place.name,

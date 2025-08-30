@@ -9,6 +9,7 @@ export type Config = {
   OPENAI_API_KEY?: string;
   PORT: number;
   ORS_TOKEN?: string;
+  GOOGLE_MAPS_API_KEY?: string;
 };
 
 export const config: Config = {
@@ -19,6 +20,7 @@ export const config: Config = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   PORT: Number(process.env.PORT) || 3001,
   ORS_TOKEN: process.env.ORS_TOKEN || '',
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 };
 
 console.log('Configuration:');
