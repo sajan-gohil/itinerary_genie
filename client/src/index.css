@@ -8,6 +8,7 @@
 	--bg-cream: #eaffea;
 	--panel: #f8fff8;
 	--sage: #c8f7e0;
+  --sage-dark: #b1dac6;
 	--teal: #a2e3d8;
 	--rust: #ffe29b;
 	--text-deep: #3e3328;
@@ -165,15 +166,17 @@ body {
   border-radius: 0.5rem;
   font-size: 0.85rem;
   transition: all 180ms ease;
-  background: #23272f;
-  border: 1px solid #23272f;
+  background: #6f7681;
+  border: 1px solid #7f8084;
+  opacity: 0.5;
   color: #f8f8f8;
 }
 .mode-btn.selected {
   background: var(--sage);
   color: #3e3328;
-  border: 1px solid var(--sage);
-  box-shadow: 0 0 8px 2px var(--sage);
+  border: 1px solid var(--sage-dark);
+  box-shadow: 0 0 8px 2px var(--sage-dark);
+  opacity: 1;
 }
 .transport-label {
   font-size: 0.85rem;
