@@ -11,23 +11,25 @@ const App: React.FC = () => {
   const [stops, setStops] = useState<any[]>([]);
 
   return (
-  <div className="flex flex-row min-h-screen w-full bg-panel bg-paper">
-      <div className="w-1/3 flex flex-col h-full max-h-screen overflow-y-auto z-10 shadow-subtle bg-panel/80 backdrop-blur-sm left-panel">
-        <InputPanel
-          setItinerary={setItinerary}
-          setRoute={setRoute}
-          setLoading={setLoading}
-          setError={setError}
-          setStops={setStops}
-        />
-        <ItineraryList
-          itinerary={itinerary}
-          stops={stops}
-          setStops={setStops}
-          setRoute={setRoute}
-        />
-      </div>
-      <div className="w-2/3 flex-1 relative bg-cream overflow-hidden">
+  <div className="flex flex-row h-screen w-screen bg-panel bg-paper overflow-hidden">
+      <div className="w-1/3 flex flex-col h-full max-h-screen overflow-hidden z-10 shadow-subtle bg-panel/80 backdrop-blur-sm left-panel">
+        {/* <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', height: '100%', gap: '18px' }}> */}
+          <InputPanel
+            setItinerary={setItinerary}
+            setRoute={setRoute}
+            setLoading={setLoading}
+            setError={setError}
+            setStops={setStops}
+          />
+          <ItineraryList
+            itinerary={itinerary}
+            stops={stops}
+            setStops={setStops}
+            setRoute={setRoute}
+          />
+        </div>
+      {/* </div> */}
+      <div className="w-2/3 flex-1 relative bg-cream overflow-hidden h-full">
         <MapView
           itinerary={itinerary}
           route={route}
