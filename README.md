@@ -37,9 +37,6 @@ Given a free‑text to‑do list and a starting location, the server acts as a s
 - Sources: server/src/routing/mapbox.ts (used by POST /api/route)
 - Optional/alternative (not wired by default): server/src/routing/openrouteservice.ts
 
-7) Live progress updates
-- Provides coarse progress via Server‑Sent Events so the UI can show steps like “Searching locations…”.
-- Source: server/src/progress.ts (SSE) exposed at GET /api/generate-progress
 
 Other utilities
 - Geocoding: GET /api/geocode uses OpenStreetMap Nominatim to turn text or lat,lon into a location.
@@ -160,7 +157,7 @@ npm run start
 
 ## Notes
 - Client map rendering requires VITE_MAPBOX_TOKEN; the server’s MAPBOX_TOKEN is used for routing.
-- LLM_PROVIDER can be set to mock for offline/demo behavior that skips real LLM calls.
+- LLM_PROVIDER can be set to mock for offline/demo behavior that skips real LLM calls (functionality not maintained).
 - Simple rate limiting is applied per IP on the server.
 
 ## Dev tips
