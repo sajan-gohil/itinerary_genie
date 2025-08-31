@@ -9,6 +9,7 @@ import parseTasksRouter from './api/parseTasks';
 import searchPlacesRouter from './api/searchPlaces';
 import routeRouter from './api/route';
 import geocodeRouter from './api/geocode';
+import { handleProgressRoute } from './progress';
 import examplesRouter from './api/examples';
 
 const app = express();
@@ -54,6 +55,9 @@ app.get('/health', (_req, res) => {
 app.use('/api', parseTasksRouter);
 app.use('/api', geocodeRouter);
 app.use('/api', examplesRouter);
+
+// Progress (SSE)
+app.get('/api/generate-progress', handleProgressRoute);
 
 app.post('/api/generate-itinerary', postGenerateItinerary);
 

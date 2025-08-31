@@ -5,8 +5,8 @@ export async function parseTasks(text: string, location?: { lat?: number; lon?: 
   return res.data;
 }
 
-export async function generateItinerary({ tasks, origin, mode, transportMode }: any) {
-  const res = await axios.post('/api/generate-itinerary', { tasks, origin, mode, transportMode });
+export async function generateItinerary({ tasks, origin, mode, transportMode, jobId }: any) {
+  const res = await axios.post('/api/generate-itinerary', { tasks, origin, mode, transportMode, jobId });
   return res.data;
 }
 
@@ -23,4 +23,13 @@ export async function geocodeAddress(q: string) {
 export async function getExamples() {
   const res = await axios.get('/api/examples');
   return res.data.examples as string[];
+}
+
+// Progress stream via SSE
+export function listenGenerateProgress(jobId: string, onMessage: (msg: string) => void): EventSource {
+  const es = new EventSource(`/api/generate-progress?jobId=${encodeURIComponent(jobId)}`);
+  es.onmessage = (e) => {
+    if (e?.data) onMessage(e.data);
+  };
+  return es;
 }

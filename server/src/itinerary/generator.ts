@@ -12,6 +12,7 @@ export type GeneratorInput = {
   mode: 'order' | 'optimize';
   transportMode: 'walking' | 'driving';
   userPrefs?: UserPrefs;
+  jobId?: string;
 };
 
 export type OrderedStop = {
@@ -39,11 +40,26 @@ function haversine(a: { lat: number; lon: number }, b: { lat: number; lon: numbe
   return R * 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
 }
 
-export async function generateItinerary({ tasks, origin, mode, transportMode, userPrefs = {} }: GeneratorInput): Promise<GeneratorOutput> {
+// After retrieving candidate places, sort them by distance from the provided origin (nearest first)
+function calculateDistance(loc1: { lat: number; lng: number }, loc2: { lat: number; lng: number }): number {
+  const rad = Math.PI / 180;
+  const dLat = (loc2.lat - loc1.lat) * rad;
+  const dLng = (loc2.lng - loc1.lng) * rad;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(loc1.lat * rad) * Math.cos(loc2.lat * rad) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return 6371 * c; // distance in kilometers
+}
+
+import { sendProgress } from '../progress';
+
+export async function generateItinerary({ tasks, origin, mode, transportMode, userPrefs = {}, jobId }: GeneratorInput): Promise<GeneratorOutput> {
   console.log("Origin at start of generateItinerary = ", origin);
   console.log("Tasks = ", tasks);
   console.log("Mode = ", mode);
   console.log("Transport Mode = ", transportMode);
+  if (jobId) sendProgress(jobId, 'Searching locations');
   // 1. Insert fixed-location tasks first
   const fixedTasks: OrderedStop[] = [];
   const flexibleTasks: Task[] = [];
@@ -69,6 +85,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
   // 2. For each flexible task, search for candidates
   const stops: OrderedStop[] = [...fixedTasks];
   for (const [i, task] of flexibleTasks.entries()) {
+    if (jobId) sendProgress(jobId, `Searching locations for task ${i + 1}/${flexibleTasks.length}`);
     // console.log("===============================================")
     // console.log(`[generateItinerary] Processing flexible task ${i + 1}/${flexibleTasks.length}:`, task);
     const gapLocation = stops.length > 0 ? stops[stops.length - 1].place.location ?? origin : origin;
@@ -125,7 +142,8 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
       }];
     }
     // 3. Filter irrelevant candidates using relevance checker (LLM with heuristic fallback)
-    const provider = (process.env.LLM_PROVIDER as any) || (config.LLM_PROVIDER as any) || 'openai';
+  const provider = (process.env.LLM_PROVIDER as any) || (config.LLM_PROVIDER as any) || 'openai';
+  if (jobId) sendProgress(jobId, `Filtering locations for task ${i + 1}/${flexibleTasks.length}`);
     const withRelevance = [] as CandidatePlace[];
     for (const c of candidates) {
       try {
@@ -152,7 +170,20 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
       }];
     }
 
-    // 4. Fetch reviews from Google Maps and analyze
+    // Sort candidates by distance from the gap location (nearest first)
+    candidates.sort((a, b) =>
+      calculateDistance(
+        { lat: gapLocation.lat, lng: gapLocation.lon },
+        { lat: a.location.lat, lng: a.location.lon }
+      ) -
+      calculateDistance(
+        { lat: gapLocation.lat, lng: gapLocation.lon },
+        { lat: b.location.lat, lng: b.location.lon }
+      )
+    );
+
+  // 4. Fetch reviews from Google Maps and analyze
+  if (jobId) sendProgress(jobId, `Checking reviews for task ${i + 1}/${flexibleTasks.length}`);
     for (const c of candidates) {
       // console.log(`[generateItinerary] Analyzing reviews for candidate:`, c);
       let reviews: string[] = [];
@@ -181,7 +212,8 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
         console.log(`[generateItinerary] Review analysis for ${c.name} (${c.id}):`, analysis);
       }
     }
-    // 5. Score candidates
+  // 5. Score candidates
+  if (jobId) sendProgress(jobId, `Scoring candidates for task ${i + 1}/${flexibleTasks.length}`);
     const scored = candidates.map(c => ({ c, score: scoreCandidate({ candidatePlace: c, task, userPrefs, currentLocation: gapLocation }) }));
     scored.sort((a, b) => b.score - a.score);
     const top = scored[0]?.c;
@@ -189,6 +221,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
   }
 
   // 6. Optimize order if requested
+  if (jobId) sendProgress(jobId, 'Optimizing route');
   let orderedStops = stops;
   if (mode === 'optimize' && orderedStops.length > 2) {
     // Greedy nearest neighbor TSP, respecting fixed tasks at their positions
@@ -213,6 +246,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
   }
 
   // 7. Output
+  if (jobId) sendProgress(jobId, 'Done');
   return {
     orderedStops,
     summaryScores: orderedStops.map(s => scoreCandidate({ candidatePlace: s.place, task: tasks.find(t => t.id === s.taskId)!, userPrefs, currentLocation: origin })),

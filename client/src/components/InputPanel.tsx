@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { parseTasks, generateItinerary, getRoute, geocodeAddress, getExamples } from '../services/api';
+import { parseTasks, generateItinerary, getRoute, geocodeAddress, getExamples, listenGenerateProgress } from '../services/api';
 
-const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setError, setStops }) => {
+const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setError, setStops, setLoadingStep }) => {
   const [todo, setTodo] = useState('');
   const [location, setLocation] = useState('');
   const [useMyLocation, setUseMyLocation] = useState(false);
@@ -81,7 +81,8 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
   const handleExample = (ex: string) => setTodo(ex);
 
   const handleGenerate = async () => {
-    setLoading(true);
+  setLoading(true);
+  setLoadingStep?.('Starting...');
     setError(null);
     try {
       const origin = coords;
@@ -97,14 +98,19 @@ const InputPanel: React.FC<any> = ({ setItinerary, setRoute, setLoading, setErro
       const parsed = await parseTasks(todo, coords ? { lat: coords.lat, lon: coords.lon } : undefined);
       const tasks = parsed.tasks.slice(0, maxStops);
       console.log("Parsed tasks = ", tasks);
-      const itinerary = await generateItinerary({ tasks, origin, mode, transportMode: transport });
+      const jobId = Math.random().toString(36).slice(2);
+      const es = listenGenerateProgress(jobId, (msg) => setLoadingStep?.(msg));
+      const itinerary = await generateItinerary({ tasks, origin, mode, transportMode: transport, jobId });
       console.log("Generated itinerary = ", itinerary);
       setItinerary(itinerary);
       setStops(itinerary.orderedStops);
       const route = await getRoute(itinerary.routeRequest);
       setRoute(route);
+      es.close();
+      setLoadingStep?.(null);
     } catch (e: any) {
       setError(e.message || 'Error generating itinerary');
+      setLoadingStep?.('');
     }
     setLoading(false);
   };
