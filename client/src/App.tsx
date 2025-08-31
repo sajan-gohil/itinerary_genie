@@ -9,6 +9,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stops, setStops] = useState<any[]>([]);
+  const [loadingStep, setLoadingStep] = useState<string | null>(null); // Track the current loading step
 
   return (
   <div className="flex flex-row h-screen w-screen bg-panel bg-paper overflow-hidden">
@@ -18,6 +19,7 @@ const App: React.FC = () => {
             setItinerary={setItinerary}
             setRoute={setRoute}
             setLoading={setLoading}
+            setLoadingStep={setLoadingStep} // New prop
             setError={setError}
             setStops={setStops}
           />
@@ -36,7 +38,13 @@ const App: React.FC = () => {
           stops={stops}
         />
       </div>
-      {loading && <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"><span className="text-white text-xl">Loading...</span></div>}
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-box">
+            <span className="loading-text">{loadingStep || 'Loading...'}</span>
+          </div>
+        </div>
+      )}
       {error && <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow z-50">{error}</div>}
     </div>
   );

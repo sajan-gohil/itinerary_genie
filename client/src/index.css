@@ -323,3 +323,32 @@ body {
 body, input, textarea, button, label, .itinerary-stop-card, .input-panel, .todo-label, .location-label, .mode-label, .transport-label, .maxstops-label, .example-btn, .location-btn, .mode-btn, .transport-btn, .generate-btn {
   font-family: 'Didact Gothic', sans-serif !important;
 }
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.loading-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  width: 20rem;
+}
+
+.loading-text {
+  color: black;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
