@@ -23,12 +23,12 @@ export const config: Config = {
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 };
 
-console.log('Configuration:');
-console.log('  LLM_PROVIDER:', config.LLM_PROVIDER );
-const mask = (v?: string) => (v ? v.slice(0, 4) + '...' + v.slice(-4) : '[not set]');
-console.log('  FOURSQUARE_API_KEY:', mask(config.FOURSQUARE_API_KEY));
-console.log('  FOURSQUARE_API_VERSION:', config.FOURSQUARE_API_VERSION);
-console.log('  MAPBOX_TOKEN:', mask(config.MAPBOX_TOKEN));
-console.log('  OPENAI_API_KEY:', mask(config.OPENAI_API_KEY));
-console.log('  PORT:', config.PORT);
-console.log('  ORS_TOKEN:', config.ORS_TOKEN || '[not set]');
+// console.log('Configuration:');
+// console.log('  LLM_PROVIDER:', config.LLM_PROVIDER );
+// const mask = (v?: string) => (v ? v.slice(0, 4) + '...' + v.slice(-4) : '[not set]');
+// console.log('  FOURSQUARE_API_KEY:', mask(config.FOURSQUARE_API_KEY));
+// console.log('  FOURSQUARE_API_VERSION:', config.FOURSQUARE_API_VERSION);
+// console.log('  MAPBOX_TOKEN:', mask(config.MAPBOX_TOKEN));
+// console.log('  OPENAI_API_KEY:', mask(config.OPENAI_API_KEY));
+// console.log('  PORT:', config.PORT);
+// console.log('  ORS_TOKEN:', config.ORS_TOKEN || '[not set]');

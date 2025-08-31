@@ -8,7 +8,7 @@ export async function fetchGooglePlaceId(name: string, address: string): Promise
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Google Maps API error: ${res.status}`);
   const data = await res.json();
-  console.log("GOOGLE MAPS PLACEID RESULT =============== ", data);
+  // console.log("GOOGLE MAPS PLACEID RESULT =============== ", data);
   const placeId = data.candidates?.[0]?.place_id || null;
   return placeId;
 }

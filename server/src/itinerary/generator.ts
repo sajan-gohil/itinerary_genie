@@ -190,7 +190,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
       // Try to fetch Google reviews using name and address
       try {
         let placeId: string | null = null;
-        console.log("C = = ", c)
+        // console.log("C = = ", c)
         if (c.name && (c as any).address) {
           placeId = await fetchGooglePlaceId(c.name, (c as any).address);
         }
@@ -209,7 +209,7 @@ export async function generateItinerary({ tasks, origin, mode, transportMode, us
         const analysis = await analyzeReviews({ placeId: c.id, source: 'openai', reviews, userQuery });
         c.rating = analysis.rating;
         // Optionally, you can store aspect scores or confidence if needed
-        console.log(`[generateItinerary] Review analysis for ${c.name} (${c.id}):`, analysis);
+        // console.log(`[generateItinerary] Review analysis for ${c.name} (${c.id}):`, analysis);
       }
     }
   // 5. Score candidates

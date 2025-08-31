@@ -7,7 +7,7 @@ export async function fetchGoogleReviews(placeId: string): Promise<string[]> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Google Maps API error: ${res.status}`);
   const data = await res.json();
-  console.log("GOOGLE MAPS RESULT =============== ", data)
+  // console.log("GOOGLE MAPS RESULT =============== ", data)
   const reviews = (data.result?.reviews || []).map((r: any) => r.text).filter(Boolean);
   return reviews;
 }

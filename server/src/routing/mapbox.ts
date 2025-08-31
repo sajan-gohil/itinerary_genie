@@ -24,7 +24,7 @@ const MAPBOX_TOKEN = config.MAPBOX_TOKEN;
 
 function buildMapboxUrl({ origin, waypoints, profile }: RouteRequest) {
   const coords = [origin, ...waypoints].map(p => `${p.lon},${p.lat}`).join(';');
-  console.log('[buildMapboxUrl] Token:', MAPBOX_TOKEN ? '[set]' : '[empty]');
+  // console.log('[buildMapboxUrl] Token:', MAPBOX_TOKEN ? '[set]' : '[empty]');
   return `https://api.mapbox.com/directions/v5/mapbox/${profile}/${coords}?geometries=polyline&overview=full&steps=true&access_token=${MAPBOX_TOKEN}`;
 }
 
@@ -34,7 +34,7 @@ export async function getRoute(req: RouteRequest): Promise<RouteResponse> {
 //   if (cached) return cached;
 
   const url = buildMapboxUrl(req);
-  console.log('[getRoute] Mapbox URL:', url);
+  // console.log('[getRoute] Mapbox URL:', url);
   let res: Response;
   try {
     res = await fetch(url);

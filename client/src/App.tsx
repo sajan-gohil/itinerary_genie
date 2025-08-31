@@ -46,6 +46,12 @@ const App: React.FC = () => {
         </div>
       )}
       {error && <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow z-50">{error}</div>}
+      {/* Top-right logo */}
+      {/* <img
+        src="/assets/itinerary_genie_logo.png"
+        alt="Itinerary Genie"
+        className="fixed top-2 right-2 h-4 w-auto z-40 opacity-95 select-none pointer-events-none"
+      /> */}
     </div>
   );
 };
