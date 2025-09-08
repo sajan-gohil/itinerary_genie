@@ -1,6 +1,6 @@
 # Itinerary Genie
 
-AI-powered trip choreographer that turns a short to‑do list into an ordered, review‑aware route you can follow on a map.
+AI-powered local travel planner that turns a short to‑do list into an ordered, review‑aware route you can follow on a map.
 
 Monorepo: React + Vite client, Express + TypeScript server.
 
