@@ -4,6 +4,8 @@ AI-powered local travel planner that turns a short to‑do list into an ordered,
 
 Monorepo: React + Vite client, Express + TypeScript server.
 
+![Screen Sample](itinerary_genie_screenshot.png)
+
 ## What it does (AI agent pipeline)
 
 Given a free‑text to‑do list and a starting location, the server acts as a set of cooperating AI agents that:
